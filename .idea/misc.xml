@@ -5,12 +5,19 @@
       <map>
         <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/drawable/boton_login_google_sin_borde_rippe.xml" value="0.3635" />
         <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/drawable/buttom.xml" value="0.3635" />
-        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/drawable/buttom_azul.xml" value="0.33" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/drawable/buttom_azul.xml" value="0.25" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/drawable/buttom_oscuro.xml" value="0.2735" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/drawable/buttom_rojo.xml" value="0.2735" />
         <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/drawable/buttom_white.xml" value="0.2735" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/drawable/card_buttom.xml" value="0.2735" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/drawable/card_panel.xml" value="0.2735" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/drawable/card_producto.xml" value="0.2735" />
         <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/drawable/ic__13_facebook.xml" value="0.3635" />
         <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/drawable/ic_google.xml" value="0.25" />
         <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/fragment_detalle.xml" value="0.25" />
         <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/fragment_home.xml" value="0.5" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/fragment_list.xml" value="0.25" />
       </map>
     </option>
   </component>

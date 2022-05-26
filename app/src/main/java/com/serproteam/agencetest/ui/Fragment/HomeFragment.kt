@@ -8,14 +8,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
+import com.facebook.GraphRequest
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.serproteam.agencetest.R
 import com.serproteam.agencetest.core.ReplaceFragment
 import com.serproteam.agencetest.databinding.FragmentHomeBinding
+import org.json.JSONException
 import java.util.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -32,12 +36,13 @@ class HomeFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-
+    var logi = "walletLog"
     val EMAIL = "raulrosado91@gmail.com"
     lateinit var callbackManager : CallbackManager
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     var replaceFragment: ReplaceFragment = ReplaceFragment()
+    lateinit var fragmentTransaction :FragmentTransaction
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +57,7 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+        fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
         configInicio()
         return binding.root
     }
@@ -62,44 +67,71 @@ class HomeFragment : Fragment() {
 
         binding.loginButton.setReadPermissions(Arrays.asList(EMAIL))
         // Callback registration
-        binding.loginButton.registerCallback(callbackManager, object :
-            FacebookCallback<LoginResult?> {
-            override fun onSuccess(loginResult: LoginResult?) {
-                // App code
-                Toast.makeText(requireContext(), "siiiiiiiiiiiiii", Toast.LENGTH_SHORT).show()
-            }
+//        binding.loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+//            override fun onSuccess(loginResult: LoginResult?) {
+//                val userId = loginResult?.accessToken?.userId
+//                Log.d(logi, "onSuccess: userId $userId")
+//
+//                val bundle = Bundle()
+//                bundle.putString("fields", "id, email, first_name, last_name, gender,age_range")
+//
+//
+//                //Graph API to access the data of user's facebook account
+//                val request = GraphRequest.newMeRequest(
+//                    loginResult?.accessToken
+//                ) { fbObject, response ->
+//                    Log.v(logi, response.toString())
+//
+//
+//                    //For safety measure enclose the request with try and catch
+//                    try {
+//
+//                        Log.d(logi, "onSuccess: fbObject $fbObject")
+//
+//                        val firstName = fbObject.getString("first_name")
+//                        val lastName = fbObject.getString("last_name")
+//                        val gender = fbObject.getString("gender")
+//                        val email = fbObject.getString("email")
+//
+//                        Log.d(logi, "onSuccess: firstName $firstName")
+//                        Log.d(logi, "onSuccess: lastName $lastName")
+//                        Log.d(logi, "onSuccess: gender $gender")
+//                        Log.d(logi, "onSuccess: email $email")
+//
+//                    } //If no data has been retrieve throw some error
+//                    catch (e: JSONException) {
+//
+//                    }
+//
+//                }
+//                //Set the bundle's data as Graph's object data
+//                request.setParameters(bundle)
+//
+//                //Execute this Graph request asynchronously
+//                request.executeAsync()
+//
+//            }
+//
+//            override fun onCancel() {
+//                Log.d(logi, "onCancel: called")
+//            }
+//
+//            override fun onError(error: FacebookException?) {
+//                Log.d(logi, "onError: called")
+//            }
+//        })
 
-            override fun onCancel() {
-                // App code
-                Toast.makeText(requireContext(), "cancelado", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onError(exception: FacebookException) {
-                // App code
-                Toast.makeText(requireContext(), "error", Toast.LENGTH_SHORT).show()
-            }
-        })
-
-        LoginManager.getInstance().registerCallback(callbackManager,
-            object : FacebookCallback<LoginResult?> {
-                override fun onSuccess(loginResult: LoginResult?) {
-                    Toast.makeText(requireContext(), "siiiiiiiiiiiiii", Toast.LENGTH_SHORT).show()
-                }
-
-                override fun onCancel() {
-                    Toast.makeText(requireContext(), "cancelado", Toast.LENGTH_SHORT).show()
-                }
-
-                override fun onError(exception: FacebookException) {
-                    Toast.makeText(requireContext(), "error", Toast.LENGTH_SHORT).show()
-                }
-            })
+        binding.btnGoogle.setOnClickListener {
+            replaceFragment.replace(ListFragment(),fragmentTransaction)
+        }
+        binding.btnLogin.setOnClickListener {
+            replaceFragment.replace(ListFragment(),fragmentTransaction)
+        }
     }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        Log.v("walletLog", "onActivityResult:"+ requestCode + ":" + resultCode + ":" + data)
         callbackManager.onActivityResult(requestCode, resultCode, data)
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.v(logi, "onActivityResult:"+ requestCode + ":" + resultCode + ":" + data)
     }
 
     companion object {
