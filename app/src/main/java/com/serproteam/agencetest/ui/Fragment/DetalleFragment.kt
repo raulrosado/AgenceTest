@@ -5,7 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentTransaction
 import com.serproteam.agencetest.R
+import com.serproteam.agencetest.core.ReplaceFragment
+import com.serproteam.agencetest.databinding.FragmentDetalleBinding
+import com.serproteam.agencetest.databinding.FragmentListBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,6 +25,10 @@ class DetalleFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private var _binding: FragmentDetalleBinding? = null
+    private val binding get() = _binding!!
+    var replaceFragment: ReplaceFragment = ReplaceFragment()
+    lateinit var fragmentTransaction : FragmentTransaction
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +43,16 @@ class DetalleFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_detalle, container, false)
+        _binding = FragmentDetalleBinding.inflate(inflater, container, false)
+        fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+        configInicio()
+        return binding.root
+    }
+
+    private fun configInicio() {
+        binding.btnBack.setOnClickListener {
+            replaceFragment.replace(ListFragment(),fragmentTransaction)
+        }
     }
 
     companion object {
