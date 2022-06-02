@@ -11,4 +11,11 @@ class ReplaceFragment {
     ) {
         fragmentTransaction.replace(R.id.contenedorFragment, fragment).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).addToBackStack(null).commit()
     }
+    fun replace2(
+        fragment: Fragment,
+        fragmentTransaction: FragmentTransaction
+    ) {
+        fragmentTransaction.replace(R.id.nav_host_fragment_content_home, fragment).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).addToBackStack(null).commit()
+    }
+
 }

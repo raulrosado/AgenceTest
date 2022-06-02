@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "608076746664",
+    "project_id": "agencetest-2d54e",
+    "storage_bucket": "agencetest-2d54e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:608076746664:android:9ec39ff4a7b91035d5d79d",
+        "android_client_info": {
+          "package_name": "com.serproteam.agencetest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "608076746664-ccpg9j59gjqu3ntju8siqu47otku6eok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDULLmVq0JzrCe5ksKnNszaQw3Z2Q1HOoM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "608076746664-ccpg9j59gjqu3ntju8siqu47otku6eok.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

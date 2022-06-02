@@ -3,24 +3,33 @@ package com.serproteam.agencetest.ui.Fragment
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.FragmentManager
+import androidx.activity.viewModels
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import com.facebook.CallbackManager
-import com.facebook.FacebookCallback
-import com.facebook.FacebookException
-import com.facebook.GraphRequest
-import com.facebook.login.LoginManager
+import androidx.fragment.app.viewModels
+import com.facebook.*
 import com.facebook.login.LoginResult
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.*
 import com.serproteam.agencetest.R
 import com.serproteam.agencetest.core.ReplaceFragment
+import com.serproteam.agencetest.core.TinyDB
+import com.serproteam.agencetest.data.model.User
 import com.serproteam.agencetest.databinding.FragmentHomeBinding
-import org.json.JSONException
+import com.serproteam.agencetest.ui.HomeActivity
+import com.serproteam.agencetest.ui.MapsActivity
+import com.serproteam.agencetest.ui.viewmodel.UserViewModel
 import java.util.*
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -36,13 +45,18 @@ class HomeFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-    var logi = "walletLog"
-    val EMAIL = "raulrosado91@gmail.com"
-    lateinit var callbackManager : CallbackManager
+    var logi = "DEV"
+    private val callbackManager = CallbackManager.Factory.create()
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     var replaceFragment: ReplaceFragment = ReplaceFragment()
-    lateinit var fragmentTransaction :FragmentTransaction
+    lateinit var fragmentTransaction: FragmentTransaction
+    val GOOGLEID = 100
+    lateinit var tinyDB: TinyDB
+    private val userViewModel: UserViewModel by viewModels()
+    lateinit var nameUser: String;
+    lateinit var lastNameUser: String;
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,80 +72,179 @@ class HomeFragment : Fragment() {
     ): View? {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+        FacebookSdk.sdkInitialize(requireActivity());
         configInicio()
         return binding.root
     }
 
     private fun configInicio() {
-        var callbackManager = CallbackManager.Factory.create();
+        tinyDB = TinyDB(requireContext())
 
-        binding.loginButton.setReadPermissions(Arrays.asList(EMAIL))
+        if (!tinyDB.getString("token").toString().isEmpty()) {
+            startActivity(Intent(requireContext(), HomeActivity::class.java))
+        }
+
+        val accessToken = AccessToken.getCurrentAccessToken()
+        val isLoggedIn = accessToken != null && !accessToken.isExpired
+        if (isLoggedIn == true) {
+            Log.v(logi, "login:" + accessToken?.source?.name)
+            Log.v(logi, "login")
+            Log.d(logi, "facebook:user:${accessToken?.applicationId}")
+            Log.d(logi, "facebook:user:${accessToken?.token}")
+            Log.d(logi, "facebook:user:${accessToken?.userId}")
+            var profileManager = ProfileManager.getInstance().loadCurrentProfile()
+            Log.v(logi, "login:" + profileManager.toString())
+        }
+
+        binding.loginButton.setPermissions("email", "public_profile")
         // Callback registration
-//        binding.loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
-//            override fun onSuccess(loginResult: LoginResult?) {
-//                val userId = loginResult?.accessToken?.userId
-//                Log.d(logi, "onSuccess: userId $userId")
-//
-//                val bundle = Bundle()
-//                bundle.putString("fields", "id, email, first_name, last_name, gender,age_range")
-//
-//
-//                //Graph API to access the data of user's facebook account
-//                val request = GraphRequest.newMeRequest(
-//                    loginResult?.accessToken
-//                ) { fbObject, response ->
-//                    Log.v(logi, response.toString())
-//
-//
-//                    //For safety measure enclose the request with try and catch
-//                    try {
-//
-//                        Log.d(logi, "onSuccess: fbObject $fbObject")
-//
-//                        val firstName = fbObject.getString("first_name")
-//                        val lastName = fbObject.getString("last_name")
-//                        val gender = fbObject.getString("gender")
-//                        val email = fbObject.getString("email")
-//
-//                        Log.d(logi, "onSuccess: firstName $firstName")
-//                        Log.d(logi, "onSuccess: lastName $lastName")
-//                        Log.d(logi, "onSuccess: gender $gender")
-//                        Log.d(logi, "onSuccess: email $email")
-//
-//                    } //If no data has been retrieve throw some error
-//                    catch (e: JSONException) {
-//
-//                    }
-//
-//                }
-//                //Set the bundle's data as Graph's object data
-//                request.setParameters(bundle)
-//
-//                //Execute this Graph request asynchronously
-//                request.executeAsync()
-//
-//            }
-//
-//            override fun onCancel() {
-//                Log.d(logi, "onCancel: called")
-//            }
-//
-//            override fun onError(error: FacebookException?) {
-//                Log.d(logi, "onError: called")
-//            }
-//        })
+        binding.loginButton.registerCallback(
+            callbackManager,
+            object : FacebookCallback<LoginResult?> {
+                override fun onCancel() {
+                    // App code
+                    Log.d(logi, "facebook:cancel")
+                }
+
+                override fun onError(exception: FacebookException) {
+                    // App code
+                    Log.d(logi, "facebook:error")
+                    Toast.makeText(
+                        requireContext(),
+                        "error en login Facebook",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                override fun onSuccess(result: LoginResult?) {
+                    Log.d(logi, "facebook:success")
+                    Log.d(logi, "facebook:onSuccess:${result}")
+                    result?.let {
+                        val token = it.accessToken
+                        Log.d(logi, "facebook:user:${token.applicationId}")
+                        Log.d(logi, "facebook:user:${token.token}")
+                        Log.d(logi, "facebook:user:${token.userId}")
+                        val credential = FacebookAuthProvider.getCredential(token.token)
+                        FirebaseAuth.getInstance().signInWithCredential(credential)
+                            .addOnCompleteListener {
+                                if (it.isSuccessful) {
+                                    Log.d(logi, "facebook:user:" + it.result?.user?.displayName)
+                                    Log.d(logi, "facebook:user:" + it.result?.user?.email)
+
+                                    var name = it.result?.user?.displayName?.split(" ")
+
+                                    if (name!!.size > 3) {
+                                        nameUser = "${name[0]} ${name[1]}"
+                                        lastNameUser = "${name[2]} ${name[3]}"
+                                    }
+                                    if (name!!.size == 3) {
+                                        nameUser = "${name[0]}"
+                                        lastNameUser = "${name[1]} ${name[2]}"
+                                    }
+
+                                    var user = User(
+                                        token.userId,
+                                        nameUser,
+                                        lastNameUser,
+                                        it.result!!.user!!.email!!,
+                                        token.token
+                                    )
+                                    userViewModel.insertUser(requireContext(), user)
+
+                                    startActivity(
+                                        Intent(
+                                            requireContext(),
+                                            HomeActivity::class.java
+                                        )
+                                    )
+                                } else {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "error en login Facebook",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                    }
+                }
+            })
+
+        binding.imageView.setOnClickListener {
+            startActivity(Intent(requireContext(), MapsActivity::class.java))
+        }
 
         binding.btnGoogle.setOnClickListener {
-            replaceFragment.replace(ListFragment(),fragmentTransaction)
+            var googleConf = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build()
+
+            val googleClient: GoogleSignInClient =
+                GoogleSignIn.getClient(requireActivity(), googleConf)
+            googleClient.signOut()
+            startActivityForResult(googleClient.signInIntent, GOOGLEID)
         }
+
+
         binding.btnLogin.setOnClickListener {
-            replaceFragment.replace(ListFragment(),fragmentTransaction)
+            startActivity(Intent(requireContext(), HomeActivity::class.java))
         }
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         callbackManager.onActivityResult(requestCode, resultCode, data)
         super.onActivityResult(requestCode, resultCode, data)
-        Log.v(logi, "onActivityResult:"+ requestCode + ":" + resultCode + ":" + data)
+        Log.v(
+            logi,
+            "result code:" + resultCode.toString() + " |||| " + requestCode.toString() + "||||| " + data.toString()
+        )
+        if (requestCode == GOOGLEID) {
+            val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                val account: GoogleSignInAccount? = task.getResult(ApiException::class.java)
+                Log.v(
+                    logi,
+                    "account:" + account?.displayName + " apellidos:" + account?.familyName + " email:" + account?.email
+                )
+                if (account != null) {
+                    var user = User(
+                        account.id!!,
+                        account.displayName!!,
+                        account.familyName!!,
+                        account.email!!,
+                        account.idToken!!
+                    )
+                    userViewModel.insertUser(requireContext(), user)
+
+                    val credential: AuthCredential =
+                        GoogleAuthProvider.getCredential(account.idToken, null)
+
+                    FirebaseAuth.getInstance().signInWithCredential(credential)
+                        .addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                startActivity(Intent(requireContext(), HomeActivity::class.java))
+                            } else {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "error en login dentro",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                }
+
+            } catch (e: ApiException) {
+                Toast.makeText(
+                    requireContext(),
+                    "Error en login",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+        } else {
+            callbackManager.onActivityResult(requestCode, resultCode, data)
+            Log.v(logi, "onActivityResult:" + requestCode + ":" + resultCode + ":" + data)
+        }
     }
 
     companion object {
@@ -154,3 +267,4 @@ class HomeFragment : Fragment() {
             }
     }
 }
+

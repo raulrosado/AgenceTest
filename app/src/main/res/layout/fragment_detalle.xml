@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,156 +8,111 @@
     android:orientation="vertical"
     tools:context=".ui.Fragment.DetalleFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight=".0"
-        android:padding="15dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginStart="4dp"
-            android:background="@drawable/buttom_claro"
-            android:padding="10dp"
-            android:src="@drawable/ic_baseline_keyboard_arrow_left_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.533"
-            app:tint="@color/white" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="@string/detail"
-            android:textColor="@color/active"
-            android:textSize="18dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageButton"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:src="@drawable/ic_baseline_shopping_cart_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.981"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.511"
-            app:tint="@color/white" />
-
-        <TextView
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="0dp"
-            android:background="@drawable/buttom_rojo"
-            android:padding="3dp"
-            android:text="13"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:visibility="visible "
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight=".4"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/mapView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight=".6"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:padding="15dp">
-
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight=".8"
-            android:orientation="horizontal"
-            >
-            <LinearLayout
+            android:layout_height="200dp"
+            android:background="@color/active"
+            android:orientation="vertical">
+
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/mapView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight=".6"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:background="@color/active" />
 
-                <androidx.cardview.widget.CardView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="20dp">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/descargacomida" />
-                </androidx.cardview.widget.CardView>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight=".3"
-                android:layout_marginLeft="10dp"
-                android:padding="10dp"
-                android:background="@drawable/buttom"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Hamburgueza Reina"
-                    android:textSize="28dp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Una brebe descripcion del producto con sus calorias todo muy bien explicado weiijndijfasjdfn asdkfjnasdjfjd faksdmfkasd;fmkqm;oefmqo3mfkqedfkmqo3eomodsmfaskdmfks"
-                    android:background="@drawable/buttom_oscuro"
-                    android:padding="10dp"
-                    android:textColor="@color/white"
-                    android:textSize="14dp" />
-            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight=".6"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:background="@drawable/buttom"
-            android:padding="5dp"
-            >
-            <Button
+            android:padding="15dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".8"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".6"
+                    android:orientation="vertical">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="20dp">
+
+                        <ImageView
+                            android:id="@+id/imgProduct"
+                            android:layout_width="match_parent"
+                            android:layout_height="170dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/descargacomida" />
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight=".3"
+                    android:background="@drawable/buttom"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:id="@+id/nameProduct"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Hamburgueza Reina"
+                        android:textSize="28dp" />
+                    <TextView
+                        android:id="@+id/priceProduct"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="$100.00"
+                        android:textStyle="bold"
+                        android:textSize="28dp" />
+
+                    <TextView
+                        android:id="@+id/descriptionProduct"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/buttom_oscuro"
+                        android:padding="10dp"
+                        android:text="Una brebe descripcion del producto con sus calorias todo muy bien explicado weiijndijfasjdfn asdkfjnasdjfjd faksdmfkasd;fmkqm;oefmqo3mfkqedfkmqo3eomodsmfaskdmfks"
+                        android:textColor="@color/white"
+                        android:textSize="14dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/AddtoCar"
-                android:layout_margin="10dp"
                 android:background="@drawable/buttom"
-                />
+                android:orientation="vertical"
+                android:layout_marginTop="20dp"
+                android:padding="5dp">
+
+                <Button
+                    android:id="@+id/addCardDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/buttom"
+                    android:text="@string/AddtoCar" />
+            </LinearLayout>
         </LinearLayout>
+
     </LinearLayout>
-
-
-</LinearLayout>
+</ScrollView>

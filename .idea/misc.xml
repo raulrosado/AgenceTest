@@ -15,10 +15,24 @@
         <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/drawable/card_producto.xml" value="0.2735" />
         <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/drawable/ic__13_facebook.xml" value="0.3635" />
         <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/drawable/ic_google.xml" value="0.25" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/activity_home.xml" value="0.271875" />
         <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/activity_main.xml" value="0.25" />
-        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/fragment_detalle.xml" value="0.38498957609451007" />
-        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/fragment_home.xml" value="0.5" />
-        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/fragment_list.xml" value="0.6196868008948546" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/activity_maps.xml" value="0.271875" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/app_bar_home.xml" value="0.271875" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/content_home.xml" value="0.261328125" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/fragment_cart.xml" value="0.271875" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/fragment_detalle.xml" value="0.25" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/fragment_gallery.xml" value="0.271875" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/fragment_home.xml" value="0.25" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/fragment_list.xml" value="0.25" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/fragment_my_product.xml" value="0.271875" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/fragment_setting.xml" value="0.271875" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/fragment_slideshow.xml" value="0.271875" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/item_list_product.xml" value="0.2015625" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/layout/nav_header_home.xml" value="0.271875" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/menu/activity_main_drawer.xml" value="0.271875" />
+        <entry key="..\:/ANDROID/PROJECTS/AgenceTest/app/src/main/res/menu/home.xml" value="0.271875" />
+        <entry key="..\:/Gradle/caches/transforms-3/3af26120f9273f7ea18fc032ccb41ab7/transformed/jetified-facebook-share-4.42.0/res/drawable/com_facebook_button_send_background.xml" value="0.1" />
       </map>
     </option>
   </component>

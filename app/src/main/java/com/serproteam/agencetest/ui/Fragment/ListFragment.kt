@@ -1,15 +1,29 @@
 package com.serproteam.agencetest.ui.Fragment
 
+import android.app.AlertDialog
+import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentTransaction
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.navigation.Navigation
+import androidx.recyclerview.widget.GridLayoutManager
+import com.facebook.login.LoginManager
+import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.serproteam.agencetest.R
+import com.serproteam.agencetest.adapter.ProductsAdapter
+import com.serproteam.agencetest.adapter.ProductsAdapter.OnProductlickListener
 import com.serproteam.agencetest.core.ReplaceFragment
-import com.serproteam.agencetest.databinding.FragmentHomeBinding
+import com.serproteam.agencetest.data.model.Product
 import com.serproteam.agencetest.databinding.FragmentListBinding
+import com.serproteam.agencetest.ui.viewmodel.CartViewModel
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,7 +35,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [ListFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ListFragment : Fragment() {
+class ListFragment : Fragment(), OnProductlickListener {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -29,7 +43,13 @@ class ListFragment : Fragment() {
     private var _binding: FragmentListBinding? = null
     private val binding get() = _binding!!
     var replaceFragment: ReplaceFragment = ReplaceFragment()
-    lateinit var fragmentTransaction : FragmentTransaction
+    lateinit var fragmentTransaction: FragmentTransaction
+    lateinit var productAdapter: ProductsAdapter
+    var logi = "Dev"
+    var cartList = ArrayList<Product>()
+    //    lateinit var productModel: ViewModel
+    private val cartViewModel: CartViewModel by viewModels()
+    lateinit var viewGlobal: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,14 +65,34 @@ class ListFragment : Fragment() {
     ): View? {
         _binding = FragmentListBinding.inflate(inflater, container, false)
         fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
-        configInicio()
+        setupRecyclerView()
+
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewGlobal = view
+        configInicio()
+    }
+
     private fun configInicio() {
-        binding.btnAddCart.setOnClickListener {
-            replaceFragment.replace(DetalleFragment(),fragmentTransaction)
+        var arrayProducts = cartViewModel.getProducts()
+        if (arrayProducts.size > 0) {
+            Log.v(
+                logi,
+                "respuesta del observer" + arrayProducts[0].name + " cantidad: " + arrayProducts.size
+            )
+            binding.recyclerProducts.visibility = View.VISIBLE
+            productAdapter = ProductsAdapter(requireContext(), arrayProducts, this)
+            binding.recyclerProducts.adapter = productAdapter
+        } else {
+            binding.recyclerProducts.visibility = View.VISIBLE
         }
+    }
+
+    fun setupRecyclerView() {
+        binding.recyclerProducts.layoutManager = GridLayoutManager(context, 2)
     }
 
     companion object {
@@ -73,5 +113,30 @@ class ListFragment : Fragment() {
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    override fun onProductClickListener(item: Product, context: Context, position: Int) {
+        val bundle = Bundle()
+        bundle.putInt("order", item.id)
+        Navigation.findNavController(viewGlobal).navigate(R.id.detalleFragment, bundle)
+    }
+
+    override fun onProductAddClickListener(item: Product, context: Context, position: Int) {
+        var dialog = AlertDialog.Builder(requireActivity())
+        dialog.setCancelable(false)
+        dialog.setTitle(resources.getString(R.string.AddtoCar))
+        dialog.setMessage(resources.getString(R.string.AddtoCarMens))
+        dialog.setPositiveButton(
+            resources.getString(R.string.Add),
+            DialogInterface.OnClickListener { dialogInterface, i ->
+                cartList.add(item)
+                cartViewModel.addProduct(cartList,requireContext())
+            })
+        dialog.setNegativeButton(
+            resources.getString(R.string.cancel),
+            DialogInterface.OnClickListener { dialogInterface, i ->
+                dialog.create().hide()
+            })
+        dialog.create().show()
     }
 }
