@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -23,11 +24,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.serproteam.agencetest.R
 import com.serproteam.agencetest.core.TinyDB
 import com.serproteam.agencetest.data.model.Product
+import com.serproteam.agencetest.data.model.User
 import com.serproteam.agencetest.databinding.ActivityHomeBinding
 import com.serproteam.agencetest.ui.viewmodel.CartViewModel
 import com.serproteam.agencetest.ui.viewmodel.UserViewModel
+import java.security.acl.Owner
 
-class HomeActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelectedListener  {
+
+class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityHomeBinding
@@ -37,55 +41,44 @@ class HomeActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
     var idOrden: Int = 0
     lateinit var producto: Product
     var cartList = ArrayList<Product>()
-    lateinit var viewGlobal: View
     lateinit var drawerLayout: DrawerLayout
-    lateinit var tinyDB:TinyDB
+    lateinit var tinyDB: TinyDB
+    lateinit var user: User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         tinyDB = TinyDB(applicationContext)
-
         setSupportActionBar(binding.appBarHome.toolbar)
+        val navView: NavigationView = binding.navView
+        val navController = findNavController(R.id.nav_host_fragment_content_home)
+        user = userViewModel.getUser(applicationContext)
 
         binding.appBarHome.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+            navController.navigate(R.id.nav_miProducts)
         }
 
         drawerLayout = binding.drawerLayout
-        val navView: NavigationView = binding.navView
-        val navController = findNavController(R.id.nav_host_fragment_content_home)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_miProducts, R.id.nav_setting
+                R.id.nav_home, R.id.nav_miProducts, R.id.nav_setting,R.id.nav_profile
             ), drawerLayout
 //            ,R.id.nav_Session
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        cartViewModel.Cart.observe(this, Observer {
-            if (it!!.size > 0) {
-                Log.v(logi, "tiene algo")
-                binding.appBarHome.cantProductCart.visibility = View.VISIBLE
-                binding.appBarHome.cantProductCart.text = it!!.size.toString()
-                cartList = it
-            } else {
-                Log.v(logi, "no tiene nada")
-                binding.appBarHome.cantProductCart.visibility = View.GONE
-            }
-        })
-
-        viewGlobal = binding.root
-
         binding.navView.setNavigationItemSelectedListener(NavigationView.OnNavigationItemSelectedListener { menuItem ->
             if (menuItem.isChecked) menuItem.isChecked = false else menuItem.isChecked = true
             drawerLayout.closeDrawers()
             when (menuItem.itemId) {
+                R.id.nav_profile -> {
+                    navController.navigate(R.id.nav_profile)
+                    return@OnNavigationItemSelectedListener true
+                }
                 R.id.nav_home -> {
                     navController.navigate(R.id.nav_home)
                     return@OnNavigationItemSelectedListener true
@@ -116,6 +109,10 @@ class HomeActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
             }
         })
 
+        val header: View = binding.navView.getHeaderView(0)
+        header.findViewById<TextView>(R.id.nameUser).text = "${user.name} ${user.lastName}"
+        header.findViewById<TextView>(R.id.emailUser).text = "${user.email}"
+
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -125,7 +122,7 @@ class HomeActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
 
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        if(item.itemId == R.id.nav_Session){
+        if (item.itemId == R.id.nav_Session) {
             Toast.makeText(this, "se cerro la session", Toast.LENGTH_SHORT).show()
             Log.v(logi, "se cerro la session")
             LoginManager.getInstance().logOut()

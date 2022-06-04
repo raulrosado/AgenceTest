@@ -204,12 +204,12 @@ class HomeFragment : Fragment() {
                 val account: GoogleSignInAccount? = task.getResult(ApiException::class.java)
                 Log.v(
                     logi,
-                    "account:" + account?.displayName + " apellidos:" + account?.familyName + " email:" + account?.email
+                    "account:" + account?.givenName + " apellidos:" + account?.familyName + " email:" + account?.email+ " photo:" + account?.photoUrl
                 )
                 if (account != null) {
                     var user = User(
                         account.id!!,
-                        account.displayName!!,
+                        account.givenName!!,
                         account.familyName!!,
                         account.email!!,
                         account.idToken!!

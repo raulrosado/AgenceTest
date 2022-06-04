@@ -7,14 +7,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.viewModels
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException
+import androidx.lifecycle.Observer
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
@@ -76,18 +76,16 @@ class DetalleFragment : Fragment(), OnMapReadyCallback{
         idOrden = requireArguments().getInt("order")
         Log.v("raulDev", "id Seleccionado:$idOrden")
 
-        with(binding.mapView) {
-            // Initialise the MapView
-            onCreate(null)
-            // Set the map ready callback to receive the GoogleMap object
-            getMapAsync{
-                MapsInitializer.initialize(requireContext())
-                setMapLocation(it)
-            }
-        }
+        binding.mapView.onCreate(savedInstanceState);
+        binding.mapView.getMapAsync(this);
 
         configInicio()
         return binding.root
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        binding.mapView.onSaveInstanceState(outState)
     }
 
     private fun setMapLocation(map : GoogleMap) {
@@ -113,7 +111,6 @@ class DetalleFragment : Fragment(), OnMapReadyCallback{
                 logi,
                 "respuesta del observer" + arrayProducts[0].name + " cantidad: " + arrayProducts.size
             )
-
             producto = arrayProducts.get(idOrden - 1)
             val uri = "@drawable/" + producto.image.toString()
             val imageResource: Int =
@@ -124,6 +121,18 @@ class DetalleFragment : Fragment(), OnMapReadyCallback{
             binding.descriptionProduct.text = producto.description
         }
 
+        cartViewModel.getCart(requireContext())
+        cartViewModel.Cart.observe(viewLifecycleOwner, Observer {
+            if (it!!.size > 0) {
+                Log.v(logi, "tiene algo")
+                requireActivity().findViewById<TextView>(R.id.cantProductCart).visibility = View.VISIBLE
+                requireActivity().findViewById<TextView>(R.id.cantProductCart).text = it!!.size.toString()
+            } else {
+                Log.v(logi, "no tiene nada")
+                requireActivity().findViewById<TextView>(R.id.cantProductCart).visibility = View.GONE
+            }
+        })
+
         binding.addCardDetail.setOnClickListener {
             var dialog = AlertDialog.Builder(requireActivity())
             dialog.setCancelable(false)
@@ -132,8 +141,7 @@ class DetalleFragment : Fragment(), OnMapReadyCallback{
             dialog.setPositiveButton(
                 resources.getString(R.string.Add),
                 DialogInterface.OnClickListener { dialogInterface, i ->
-                    cartList.add(producto)
-                    cartViewModel.addProduct(cartList, requireContext())
+                    cartViewModel.addProduct(producto, requireContext())
                 })
             dialog.setNegativeButton(
                 resources.getString(R.string.cancel),
@@ -154,13 +162,12 @@ class DetalleFragment : Fragment(), OnMapReadyCallback{
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
-//    override fun onMapReady(googleMap: GoogleMap) {
-//        mMap = googleMap
-//        // Add a marker in Sydney and move the camera
-//        val sydney = LatLng(-34.0, 151.0)
-//        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-//    }
+    override fun onMapReady(googleMap: GoogleMap) {
+        // Add a marker in Sydney and move the camera
+        val sydney = LatLng(-34.0, 151.0)
+        googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+    }
 
     companion object {
         /**
@@ -180,9 +187,6 @@ class DetalleFragment : Fragment(), OnMapReadyCallback{
                     putString(ARG_PARAM2, param2)
                 }
             }
-    }
-
-    override fun onMapReady(p0: GoogleMap) {
     }
 
 }

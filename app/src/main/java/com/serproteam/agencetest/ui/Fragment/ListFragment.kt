@@ -3,20 +3,22 @@ package com.serproteam.agencetest.ui.Fragment
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
+import android.widget.TextView
+import androidx.annotation.RequiresApi
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
-import com.facebook.login.LoginManager
-import com.google.android.material.navigation.NavigationView
-import com.google.firebase.auth.FirebaseAuth
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.serproteam.agencetest.R
 import com.serproteam.agencetest.adapter.ProductsAdapter
 import com.serproteam.agencetest.adapter.ProductsAdapter.OnProductlickListener
@@ -47,7 +49,10 @@ class ListFragment : Fragment(), OnProductlickListener {
     lateinit var productAdapter: ProductsAdapter
     var logi = "Dev"
     var cartList = ArrayList<Product>()
-    //    lateinit var productModel: ViewModel
+    var visibles = 0
+    var lastVisible = 0
+    var lastvisiblePosition = 0
+
     private val cartViewModel: CartViewModel by viewModels()
     lateinit var viewGlobal: View
 
@@ -66,7 +71,6 @@ class ListFragment : Fragment(), OnProductlickListener {
         _binding = FragmentListBinding.inflate(inflater, container, false)
         fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
         setupRecyclerView()
-
         return binding.root
     }
 
@@ -76,6 +80,7 @@ class ListFragment : Fragment(), OnProductlickListener {
         configInicio()
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun configInicio() {
         var arrayProducts = cartViewModel.getProducts()
         if (arrayProducts.size > 0) {
@@ -83,12 +88,99 @@ class ListFragment : Fragment(), OnProductlickListener {
                 logi,
                 "respuesta del observer" + arrayProducts[0].name + " cantidad: " + arrayProducts.size
             )
+
             binding.recyclerProducts.visibility = View.VISIBLE
-            productAdapter = ProductsAdapter(requireContext(), arrayProducts, this)
+            productAdapter = ProductsAdapter(
+                requireContext(),
+                arrayProducts, binding.recyclerProducts, this
+            )
+
+            val resId = R.anim.learn_layout_animation_fall_down
+            val animation = AnimationUtils.loadLayoutAnimation(
+                activity, resId
+            )
+            binding.recyclerProducts.setLayoutAnimation(
+                animation
+            )
+            binding.recyclerProducts.setHasFixedSize(true)
+
             binding.recyclerProducts.adapter = productAdapter
+            productAdapter.addItem(arrayProducts.subList(0, 8))
+            visibles = 8
+
         } else {
             binding.recyclerProducts.visibility = View.VISIBLE
         }
+
+        /***
+         *  Adding OnScroll listener for parent RecyclerView
+         */
+        binding.recyclerProducts.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+//            Log.v(logi, "oldScrooll: ${oldScrollY}  scrool:${scrollY}")
+            if (oldScrollY < -60) {
+                val layoutManager = binding.recyclerProducts.layoutManager as LinearLayoutManager
+                val visibleItemCount = layoutManager.childCount
+                val totalItemCount = layoutManager.itemCount
+                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+                var falta = arrayProducts.size - totalItemCount
+                Log.v(
+                    logi,
+                    "totalItemCount: $visibles" + " arrayProducts.size: " + arrayProducts.size + "falta:" + falta
+                )
+                Log.v(logi, "firstVisibleItemPosition: $firstVisibleItemPosition")
+
+                lastVisible = visibles
+                lastVisible = visibles +3
+                Log.v(logi, "falta: " + lastVisible)
+                Log.v(logi, "falta: +3" )
+                if (lastVisible > arrayProducts.size) {
+                    lastVisible = arrayProducts.size
+                }
+
+                if (visibles < arrayProducts.size) {
+                    Log.v(
+                        logi,
+                        " ES MENOR"
+                    )
+//                    Log.v(
+//                        logi,
+//                        "${visibles} < ${lastVisible}"
+//                    )
+//                    if (lastVisible > arrayProducts.size) {
+//                        lastVisible = arrayProducts.size
+//                        Log.v(logi, "es mayor")
+//                    }
+//                    if (visibles > arrayProducts.size) {
+//                        visibles = arrayProducts.size
+//                        Log.v(logi, "es mayor")
+//                    }
+                    if (visibles < arrayProducts.size) {
+                        productAdapter.addItem(arrayProducts.subList(visibles, lastVisible))
+                    }
+                    visibles = lastVisible
+                    if (visibles > arrayProducts.size - 1) {
+                        visibles = arrayProducts.size
+                        Log.v(logi, "es mayor")
+                    }
+                }
+
+            }
+        }
+
+        cartViewModel.getCart(requireContext())
+        cartViewModel.Cart.observe(viewLifecycleOwner, Observer {
+            if (it!!.size > 0) {
+                Log.v(logi, "tiene algo")
+                requireActivity().findViewById<TextView>(R.id.cantProductCart).visibility =
+                    View.VISIBLE
+                requireActivity().findViewById<TextView>(R.id.cantProductCart).text =
+                    it!!.size.toString()
+            } else {
+                Log.v(logi, "no tiene nada")
+                requireActivity().findViewById<TextView>(R.id.cantProductCart).visibility =
+                    View.GONE
+            }
+        })
     }
 
     fun setupRecyclerView() {
@@ -129,8 +221,7 @@ class ListFragment : Fragment(), OnProductlickListener {
         dialog.setPositiveButton(
             resources.getString(R.string.Add),
             DialogInterface.OnClickListener { dialogInterface, i ->
-                cartList.add(item)
-                cartViewModel.addProduct(cartList,requireContext())
+                cartViewModel.addProduct(item, requireContext())
             })
         dialog.setNegativeButton(
             resources.getString(R.string.cancel),

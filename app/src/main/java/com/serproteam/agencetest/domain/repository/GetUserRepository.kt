@@ -4,16 +4,15 @@ import android.content.Context
 import com.serproteam.agencetest.core.TinyDB
 import com.serproteam.agencetest.data.model.User
 
-class GetUserRepository {
+class GetUserRepository() {
     fun getUser(context: Context): User {
         var tinyDB = TinyDB(context)
-        var user = User(
+        return User(
             tinyDB.getString("userId")!!,
             tinyDB.getString("name")!!,
             tinyDB.getString("lastName")!!,
             tinyDB.getString("email")!!,
-            tinyDB.getString("token")!!
+            tinyDB.getString("token")!!,
         )
-        return user
     }
 }

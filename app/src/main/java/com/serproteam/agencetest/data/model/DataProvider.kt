@@ -49,6 +49,104 @@ class DataProvider() {
             "Una breve descripcion de los productos que se ofrecen en esta tienda",
             "150.00"
         ))
+        dataList.add(Product(
+            7,
+            "Hamburguesa",
+            "descargacomida",
+            "Una breve descripcion de los productos que se ofrecen en esta tienda",
+            "100.00"
+        ))
+        dataList.add(Product(
+            8,
+            "Fresas con crema",
+            "fresitas",
+            "Una breve descripcion de los productos que se ofrecen en esta tienda",
+            "150.00"
+        ))
+        dataList.add(Product(
+            9,
+            "Hamburguesa",
+            "descargacomida",
+            "Una breve descripcion de los productos que se ofrecen en esta tienda",
+            "100.00"
+        ))
+        dataList.add(Product(
+            10,
+            "Fresas con crema",
+            "fresitas",
+            "Una breve descripcion de los productos que se ofrecen en esta tienda",
+            "150.00"
+        ))
+        dataList.add(Product(
+            11,
+            "Hamburguesa",
+            "descargacomida",
+            "Una breve descripcion de los productos que se ofrecen en esta tienda",
+            "100.00"
+        ))
+        dataList.add(Product(
+            12,
+            "Fresas con crema",
+            "serhserhherhrh",
+            "Una breve descripcion de los productos que se ofrecen en esta tienda",
+            "150.00"
+        ))
+        dataList.add(Product(
+            13,
+            "Hamburguesa",
+            "descargacomida",
+            "Una breve descripcion de los productos que se ofrecen en esta tienda",
+            "100.00"
+        ))
+        dataList.add(Product(
+            14,
+            "Fresas con crema",
+            "fresitas",
+            "Una breve descripcion de los productos que se ofrecen en esta tienda",
+            "150.00"
+        ))
+        dataList.add(Product(
+            15,
+            "Hamburguesa",
+            "descargacomida",
+            "Una breve descripcion de los productos que se ofrecen en esta tienda",
+            "100.00"
+        ))
+        dataList.add(Product(
+            16,
+            "Fresas con crema",
+            "serhserhherhrh",
+            "Una breve descripcion de los productos que se ofrecen en esta tienda",
+            "150.00"
+        ))
+        dataList.add(Product(
+            17,
+            "Hamburguesa",
+            "descargacomida",
+            "Una breve descripcion de los productos que se ofrecen en esta tienda",
+            "100.00"
+        ))
+        dataList.add(Product(
+            18,
+            "Fresas con crema",
+            "fresitas",
+            "Una breve descripcion de los productos que se ofrecen en esta tienda",
+            "150.00"
+        ))
+        dataList.add(Product(
+            19,
+            "Hamburguesa",
+            "descargacomida",
+            "Una breve descripcion de los productos que se ofrecen en esta tienda",
+            "100.00"
+        ))
+        dataList.add(Product(
+            20,
+            "Fresas con crema",
+            "serhserhherhrh",
+            "Una breve descripcion de los productos que se ofrecen en esta tienda",
+            "150.00"
+        ))
         return dataList
     }
 }

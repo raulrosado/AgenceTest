@@ -1,23 +1,16 @@
 package com.serproteam.agencetest.adapter
 
-import android.content.Context
 import android.os.Handler
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
-import com.serproteam.agencetest.R
-import com.serproteam.agencetest.data.model.Product
+import com.serproteam.agencetest.core.LazyLoadRecyclerCallback
 
-class ProductsAdapter(
-    private val context: Context,
-    private val productArray: ArrayList<Product>,
-    private val recyclerView: RecyclerView,
-    private val itemClickListener: OnProductlickListener
-) :
-    RecyclerView.Adapter<BaseViewHolder<*>>() {
+abstract class CustomRecyler<
+        Product, DATA_VH_CLASS : RecyclerView.ViewHolder,
+        LAZYLOAD_VH_CLASS : RecyclerView.ViewHolder
+        >(
+    private val recyclerView: RecyclerView
+    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
     private var list: MutableList<Product> = ArrayList()
     private var progressVisibility = false
@@ -77,24 +70,14 @@ class ProductsAdapter(
         notifyItemRemoved(position)
     }
 
-    interface OnProductlickListener {
-        fun onProductClickListener(item: Product, context: Context, position: Int)
-        fun onProductAddClickListener(item: Product, context: Context, position: Int)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == VIEW_TYPE_ITEM)
+            addLayoutForParsing(parent, viewType)
+        else
+            addLazyLoadingLayoutParsing(parent, viewType)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<*> {
-        return MainViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.item_list_product, parent, false)
-        )
-    }
-
-    override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
-        when (holder) {
-            is MainViewHolder -> holder.bind(list[position], position)
-        }
-    }
-
-    override fun getItemCount(): Int = list.size
+    override fun getItemCount(): Int = list.size + 1
 
     override fun getItemViewType(position: Int): Int {
         return if (isPositionFooter(position)) VIEW_TYPE_LOADING
@@ -106,25 +89,26 @@ class ProductsAdapter(
         return position == list.size
     }
 
-    inner class MainViewHolder(val view: View) : BaseViewHolder<Int>(view) {
-        override fun bind(item: Product, position: Int) {
-            val uri = "@drawable/" + item.image.toString()
-            Log.v("raul", uri.toString());
-            Log.v("raul", item.toString());
-            val imageResource: Int =
-                context.getResources().getIdentifier(uri, null, context.getPackageName())
-            view.findViewById<ImageView>(R.id.imgProduct).setImageResource(imageResource)
-            view.findViewById<TextView>(R.id.nameProduct).text = item.name
-            view.findViewById<TextView>(R.id.priceProduct).text = item.price
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (getItemViewType(position) == VIEW_TYPE_ITEM) {
+            @Suppress("UNCHECKED_CAST")
+            onBindHolder(holder as DATA_VH_CLASS, list[position], position)
+        } else {
+            //default size for now, later from api
+            if (canLoadAgain && list.isNotEmpty()) {
+                progressVisibility = true //this variable can be removed
+                listener?.onLoadMore()
+            } else progressVisibility = false
 
-            view.findViewById<LinearLayout>(R.id.cardProduct).setOnClickListener {
-                itemClickListener.onProductClickListener(item, context, position)
-            }
-            view.findViewById<Button>(R.id.btnAddCart).setOnClickListener {
-                itemClickListener.onProductAddClickListener(item, context, position)
-            }
+            @Suppress("UNCHECKED_CAST")
+            onBindLazyLoadHolder(holder as LAZYLOAD_VH_CLASS, progressVisibility, position)
         }
     }
+
+    abstract fun onBindHolder(holder: DATA_VH_CLASS, data: Product, position: Int)
+    abstract fun onBindLazyLoadHolder(holder: LAZYLOAD_VH_CLASS, visibility: Boolean, position: Int)
+    abstract fun addLayoutForParsing(parent: ViewGroup, viewType: Int): DATA_VH_CLASS
+    abstract fun addLazyLoadingLayoutParsing(parent: ViewGroup, viewType: Int): LAZYLOAD_VH_CLASS
 
     /**Responsible for lazy loading in recycler view items
      * #onLoadMore will be invoked when user scrolls to end,

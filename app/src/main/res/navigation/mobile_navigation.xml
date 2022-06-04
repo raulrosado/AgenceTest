@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_nav_home_to_nav_miProducts"
             app:destination="@id/nav_miProducts" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_profile"
+            app:destination="@id/nav_profile" />
     </fragment>
 
     <fragment
@@ -47,6 +50,16 @@
         tools:layout="@layout/fragment_detalle" >
         <action
             android:id="@+id/action_detalleFragment_to_nav_home"
+            app:destination="@id/nav_home" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="com.serproteam.agencetest.ui.Fragment.PerfilFragment"
+        android:label="@string/menu_profile"
+        tools:layout="@layout/fragment_perfil" >
+
+        <action
+            android:id="@+id/action_nav_profile_to_nav_home"
             app:destination="@id/nav_home" />
     </fragment>
 

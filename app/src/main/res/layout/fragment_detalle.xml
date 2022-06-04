@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
     android:background="@color/purple_700"
     android:orientation="vertical"
     tools:context=".ui.Fragment.DetalleFragment">
@@ -23,7 +24,10 @@
                 android:id="@+id/mapView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/active" />
+                android:background="@color/active"
+                map:uiRotateGestures="true"
+                map:uiZoomGestures="true"
+                />
 
         </LinearLayout>
 

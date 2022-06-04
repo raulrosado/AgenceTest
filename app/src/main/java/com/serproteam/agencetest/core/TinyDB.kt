@@ -4,9 +4,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Environment
 import android.text.TextUtils
-import androidx.fragment.app.Fragment
+import android.util.Log
 import com.google.gson.Gson
 import java.util.*
+import kotlin.collections.ArrayList
 
 class TinyDB(appContext: Context) {
     var context = appContext
@@ -39,12 +40,111 @@ class TinyDB(appContext: Context) {
     }
 
     /**
+     * Get parsed ArrayList of String from SharedPreferences at 'key'
+     * @param key SharedPreferences key
+     * @return ArrayList of String
+     */
+    open fun getListString(key: String?): ArrayList<String?>? {
+        return TextUtils.split(
+                    preferences!!.getString(key, ""),
+                    "‚‗‚"
+                ) as ArrayList<String?>?
+    }
+
+    /**
+     * Get parsed ArrayList of Integers from SharedPreferences at 'key'
+     * @param key SharedPreferences key
+     * @return ArrayList of Integers
+     */
+    fun getListInt(key: String?): ArrayList<Int>? {
+        val myList = preferences!!.getString(key, "").toString().split("‚‗‚")
+        var arrayToList: ArrayList<String> = ArrayList()
+        arrayToList.addAll(myList)
+        val newList = ArrayList<Int>()
+        Log.v("DEV",arrayToList.size.toString());
+        if(myList.get(0) != "") {
+            for (item in arrayToList) newList.add(item.toInt())
+        }
+        return newList
+    }
+
+    /**
+     * Get double value from SharedPreferences at 'key'. If exception thrown, return 'defaultValue'
+     * @param key SharedPreferences key
+     * @param defaultValue double value returned if exception is thrown
+     * @return double value at 'key' or 'defaultValue' if exception is thrown
+     */
+    fun getDouble(key: String?, defaultValue: Double): Double {
+        val number = getString(key)
+        return try {
+            number!!.toDouble()
+        } catch (e: NumberFormatException) {
+            defaultValue
+        }
+    }
+
+    /**
+     * Get parsed ArrayList of Double from SharedPreferences at 'key'
+     * @param key SharedPreferences key
+     * @return ArrayList of Double
+     */
+    fun getListDouble(key: String?): ArrayList<Double>? {
+        val myList = TextUtils.split(preferences!!.getString(key, ""), "‚‗‚")
+        val arrayToList: ArrayList<String> = myList as ArrayList<String>
+        val newList = ArrayList<Double>()
+        for (item in arrayToList) newList.add(item.toDouble())
+        return newList
+    }
+
+    /**
+     * Get parsed ArrayList of Integers from SharedPreferences at 'key'
+     * @param key SharedPreferences key
+     * @return ArrayList of Longs
+     */
+    fun getListLong(key: String?): ArrayList<Long>? {
+        val myList = TextUtils.split(preferences!!.getString(key, ""), "‚‗‚")
+        val arrayToList: ArrayList<String> = myList as ArrayList<String>
+        val newList = ArrayList<Long>()
+        for (item in arrayToList) newList.add(item.toLong())
+        return newList
+    }
+
+    /**
      * Get boolean value from SharedPreferences at 'key'. If key not found, return 'defaultValue'
      * @param key SharedPreferences key
      * @return boolean value at 'key' or 'defaultValue' if key not found
      */
     fun getBoolean(key: String?): Boolean {
         return preferences!!.getBoolean(key, false)
+    }
+
+    /**
+     * Get parsed ArrayList of Boolean from SharedPreferences at 'key'
+     * @param key SharedPreferences key
+     * @return ArrayList of Boolean
+     */
+    fun getListBoolean(key: String?): ArrayList<Boolean>? {
+        val myList = getListString(key)
+        val newList = ArrayList<Boolean>()
+        for (item in myList!!) {
+            if (item == "true") {
+                newList.add(true)
+            } else {
+                newList.add(false)
+            }
+        }
+        return newList
+    }
+
+    fun getListObject(key: String?, mClass: Class<*>?): ArrayList<Any>? {
+        val gson = Gson()
+        val objStrings = getListString(key)
+        val objects = ArrayList<Any>()
+        for (jObjString in objStrings!!) {
+            val value = gson.fromJson(jObjString, mClass)
+            objects.add(value)
+        }
+        return objects
     }
 
     fun <T> getObject(key: String?, classOfT: Class<T>?): T {
@@ -84,7 +184,7 @@ class TinyDB(appContext: Context) {
      * @param key SharedPreferences key
      * @param intList ArrayList of Integer to be added
      */
-    fun putListInt(key: String?, intList: ArrayList<Int?>) {
+    fun putListInt(key: String?, intList: ArrayList<Int>) {
         checkForNullKey(key)
         val myIntList: Array<Int> = intList.toArray(arrayOfNulls(intList.size))
         preferences!!.edit().putString(key, TextUtils.join("‚‗‚", myIntList)).apply()

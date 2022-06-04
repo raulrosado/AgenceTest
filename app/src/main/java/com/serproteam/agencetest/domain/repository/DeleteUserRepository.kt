@@ -12,5 +12,6 @@ class DeleteUserRepository {
         tinyDB.remove("lastName")
         tinyDB.remove("email")
         tinyDB.remove("token")
+        tinyDB.remove("cart")
     }
 }
