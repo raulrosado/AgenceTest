@@ -1,6 +1,7 @@
 package com.serproteam.agencetest.ui.Fragment
 
 import android.content.Intent
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -26,10 +27,8 @@ import com.serproteam.agencetest.core.TinyDB
 import com.serproteam.agencetest.data.model.User
 import com.serproteam.agencetest.databinding.FragmentHomeBinding
 import com.serproteam.agencetest.ui.HomeActivity
-import com.serproteam.agencetest.ui.MapsActivity
 import com.serproteam.agencetest.ui.viewmodel.UserViewModel
 import java.util.*
-
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -111,7 +110,7 @@ class HomeFragment : Fragment() {
                     Log.d(logi, "facebook:error")
                     Toast.makeText(
                         requireContext(),
-                        "error en login Facebook",
+                        resources.getString(R.string.errorLoginFacebook),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -119,6 +118,7 @@ class HomeFragment : Fragment() {
                 override fun onSuccess(result: LoginResult?) {
                     Log.d(logi, "facebook:success")
                     Log.d(logi, "facebook:onSuccess:${result}")
+                    binding.progressBar2.visibility = View.VISIBLE
                     result?.let {
                         val token = it.accessToken
                         Log.d(logi, "facebook:user:${token.applicationId}")
@@ -150,7 +150,7 @@ class HomeFragment : Fragment() {
                                         token.token
                                     )
                                     userViewModel.insertUser(requireContext(), user)
-
+                                    binding.progressBar2.visibility = View.GONE
                                     startActivity(
                                         Intent(
                                             requireContext(),
@@ -160,7 +160,7 @@ class HomeFragment : Fragment() {
                                 } else {
                                     Toast.makeText(
                                         requireContext(),
-                                        "error en login Facebook",
+                                        resources.getString(R.string.errorLoginFacebook),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
@@ -169,11 +169,8 @@ class HomeFragment : Fragment() {
                 }
             })
 
-        binding.imageView.setOnClickListener {
-            startActivity(Intent(requireContext(), MapsActivity::class.java))
-        }
-
         binding.btnGoogle.setOnClickListener {
+            binding.progressBar2.visibility = View.VISIBLE
             var googleConf = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -222,11 +219,12 @@ class HomeFragment : Fragment() {
                     FirebaseAuth.getInstance().signInWithCredential(credential)
                         .addOnCompleteListener {
                             if (it.isSuccessful) {
+                                binding.progressBar2.visibility = View.GONE
                                 startActivity(Intent(requireContext(), HomeActivity::class.java))
                             } else {
                                 Toast.makeText(
                                     requireContext(),
-                                    "error en login dentro",
+                                    resources.getString(R.string.errorLoginGoogle),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
@@ -236,7 +234,7 @@ class HomeFragment : Fragment() {
             } catch (e: ApiException) {
                 Toast.makeText(
                     requireContext(),
-                    "Error en login",
+                    resources.getString(R.string.errorLoginGoogle),
                     Toast.LENGTH_SHORT
                 ).show()
             }

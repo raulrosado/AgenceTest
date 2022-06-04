@@ -4,11 +4,15 @@ pluginManagement {
         google()
         jcenter()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
         maven { url 'https://maven.google.com' }
-        maven {
-            url = uri("https://repo.spring.io/release")
-        }
+        maven { url 'https://jitpack.io' }
+        maven { uri("https://repo.spring.io/release")}
+        maven {uri("https://repository.jboss.org/maven2")}
+
+        maven { url "https://dl.google.com/dl/android/maven2/" }
+        maven { url "http://jcenter.bintray.com/" }
+        maven { url 'https://plugins.gradle.org/m2/'}
+        maven { url 'https://mvnrepository.com/artifact/com.android.tools.lint/lint-gradle-api' }
     }
 }
 dependencyResolutionManagement {
@@ -17,11 +21,15 @@ dependencyResolutionManagement {
         google()
         jcenter()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
         maven { url 'https://maven.google.com' }
-        maven {
-            url = uri("https://repo.spring.io/release")
-        }
+        maven { url 'https://jitpack.io' }
+        maven { uri("https://repo.spring.io/release")}
+        maven {uri("https://repository.jboss.org/maven2")}
+
+        maven { url "https://dl.google.com/dl/android/maven2/" }
+        maven { url "http://jcenter.bintray.com/" }
+        maven { url 'https://plugins.gradle.org/m2/'}
+        maven { url 'https://mvnrepository.com/artifact/com.android.tools.lint/lint-gradle-api' }
     }
 }
 rootProject.name = "AgenceTest"

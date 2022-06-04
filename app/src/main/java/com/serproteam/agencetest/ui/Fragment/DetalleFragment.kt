@@ -1,7 +1,10 @@
 package com.serproteam.agencetest.ui.Fragment
 
+import android.Manifest
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,16 +12,24 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.karumi.dexter.listener.single.PermissionListener
 import com.serproteam.agencetest.R
 import com.serproteam.agencetest.core.ReplaceFragment
 import com.serproteam.agencetest.data.model.Product
@@ -36,7 +47,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [DetalleFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class DetalleFragment : Fragment(), OnMapReadyCallback{
+class DetalleFragment : Fragment(), OnMapReadyCallback , GoogleMap.OnMyLocationClickListener{
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -49,13 +60,16 @@ class DetalleFragment : Fragment(), OnMapReadyCallback{
     var idOrden: Int = 0
     lateinit var producto: Product
     var cartList = ArrayList<Product>()
-    lateinit var map: GoogleMap
+
+    lateinit var mapView: MapView
+    lateinit var gmap: GoogleMap
+    var LOCATION_REQUEST_CODE = 111
+    private val MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey"
 
     val position = LatLng(41.015137, 28.979530)
-
     var markerOptions = MarkerOptions().position(position)
-
-    lateinit var marker : Marker
+    lateinit var marker: Marker
+    var permiso = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,8 +90,39 @@ class DetalleFragment : Fragment(), OnMapReadyCallback{
         idOrden = requireArguments().getInt("order")
         Log.v("raulDev", "id Seleccionado:$idOrden")
 
-        binding.mapView.onCreate(savedInstanceState);
-        binding.mapView.getMapAsync(this);
+        Dexter.withContext(requireContext())
+            .withPermissions(
+                Manifest.permission.ACCESS_COARSE_LOCATION
+                ,Manifest.permission.ACCESS_FINE_LOCATION)
+            .withListener(object: MultiplePermissionsListener {
+                override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                    report?.let {
+                        if(report.areAllPermissionsGranted()){
+                            permiso = true
+                        }
+                    }
+                }
+                override fun onPermissionRationaleShouldBeShown(
+                    permissions: MutableList<PermissionRequest>?,
+                    token: PermissionToken?
+                ) {
+                    token?.continuePermissionRequest()
+                }
+            })
+            .withErrorListener {
+                permiso = false
+            }
+            .check()
+
+
+        var mapViewBundle: Bundle? = null
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAP_VIEW_BUNDLE_KEY)
+        }
+
+        mapView = binding.mapView
+        mapView.onCreate(mapViewBundle)
+        mapView.getMapAsync(this)
 
         configInicio()
         return binding.root
@@ -85,22 +130,13 @@ class DetalleFragment : Fragment(), OnMapReadyCallback{
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        binding.mapView.onSaveInstanceState(outState)
-    }
-
-    private fun setMapLocation(map : GoogleMap) {
-        with(map) {
-            moveCamera(CameraUpdateFactory.newLatLngZoom(position, 13f))
-            mapType = GoogleMap.MAP_TYPE_NORMAL
-            setOnMapClickListener {
-                if(::marker.isInitialized){
-                    marker.remove()
-                }
-                markerOptions.position(it)
-                marker = addMarker(markerOptions)!!
-                Toast.makeText(requireContext(), "Click on.....", Toast.LENGTH_SHORT).show()
-            }
+        var mapViewBundle = outState.getBundle(MAP_VIEW_BUNDLE_KEY)
+        if (mapViewBundle == null) {
+            mapViewBundle = Bundle()
+            outState.putBundle(MAP_VIEW_BUNDLE_KEY, mapViewBundle)
         }
+
+        mapView.onSaveInstanceState(mapViewBundle)
     }
 
     private fun configInicio() {
@@ -125,11 +161,14 @@ class DetalleFragment : Fragment(), OnMapReadyCallback{
         cartViewModel.Cart.observe(viewLifecycleOwner, Observer {
             if (it!!.size > 0) {
                 Log.v(logi, "tiene algo")
-                requireActivity().findViewById<TextView>(R.id.cantProductCart).visibility = View.VISIBLE
-                requireActivity().findViewById<TextView>(R.id.cantProductCart).text = it!!.size.toString()
+                requireActivity().findViewById<TextView>(R.id.cantProductCart).visibility =
+                    View.VISIBLE
+                requireActivity().findViewById<TextView>(R.id.cantProductCart).text =
+                    it!!.size.toString()
             } else {
                 Log.v(logi, "no tiene nada")
-                requireActivity().findViewById<TextView>(R.id.cantProductCart).visibility = View.GONE
+                requireActivity().findViewById<TextView>(R.id.cantProductCart).visibility =
+                    View.GONE
             }
         })
 
@@ -151,22 +190,59 @@ class DetalleFragment : Fragment(), OnMapReadyCallback{
             dialog.create().show()
         }
 
+
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+    override fun onResume() {
+        super.onResume()
+        mapView.onResume()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mapView.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapView.onStop()
+    }
+
+    override fun onPause() {
+        mapView.onPause()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        mapView.onDestroy()
+        super.onDestroy()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView.onLowMemory()
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        gmap = googleMap
+        val uiSettings: UiSettings = gmap.getUiSettings()
+        uiSettings.isIndoorLevelPickerEnabled = true
+        uiSettings.isMyLocationButtonEnabled = true
+        uiSettings.isMapToolbarEnabled = true
+        uiSettings.isCompassEnabled = true
+        uiSettings.isZoomControlsEnabled = true
+        uiSettings.setRotateGesturesEnabled(true);
+        uiSettings.setScrollGesturesEnabled(true);
+        uiSettings.setTiltGesturesEnabled(true);
+        uiSettings.setZoomGesturesEnabled(true);
+
+        val ny = LatLng(40.7143528, -74.0059731)
+        val markerOptions = MarkerOptions()
+        markerOptions.position(ny)
+        gmap.addMarker(markerOptions)
+        gmap.animateCamera(CameraUpdateFactory.newLatLngZoom(ny, 18f), 4000, null)
+        gmap.setOnMyLocationClickListener(this)
+        enableLocation()
     }
 
     companion object {
@@ -187,6 +263,66 @@ class DetalleFragment : Fragment(), OnMapReadyCallback{
                     putString(ARG_PARAM2, param2)
                 }
             }
+
+        const val REQUEST_CODE_LOCATION = 0
+    }
+
+    private fun enableLocation() {
+        if (!::gmap.isInitialized) return
+        if (permiso==true) {
+            gmap.isMyLocationEnabled = true
+            gmap.uiSettings.isMyLocationButtonEnabled = true
+        } else {
+            requestLocationPermission()
+        }
+    }
+
+    private fun requestLocationPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        ) {
+            Toast.makeText(
+                requireContext(),
+                resources.getString(R.string.gotoSetting),
+                Toast.LENGTH_SHORT
+            ).show()
+        } else {
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                REQUEST_CODE_LOCATION
+            )
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            REQUEST_CODE_LOCATION -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                gmap.isMyLocationEnabled = true
+                gmap.uiSettings.isMyLocationButtonEnabled = true
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    resources.getString(R.string.gotoSettingInfo),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            else -> {
+            }
+        }
+    }
+
+    override fun onMyLocationClick(p0: Location) {
+        Toast.makeText(requireContext(), resources.getString(R.string.youarein) + " ${p0.latitude}, ${p0.longitude}", Toast.LENGTH_SHORT).show()
     }
 
 }

@@ -114,13 +114,9 @@ class ListFragment : Fragment(), OnProductlickListener {
             binding.recyclerProducts.visibility = View.VISIBLE
         }
 
-        /***
-         *  Adding OnScroll listener for parent RecyclerView
-         */
         binding.recyclerProducts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (!recyclerView.canScrollVertically(1)) {
-                    Toast.makeText(context, "Last", Toast.LENGTH_LONG).show();
                     lastVisible = visibles + 3
                     Log.v(logi, "falta: " + lastVisible)
                     Log.v(logi, "falta: +3")

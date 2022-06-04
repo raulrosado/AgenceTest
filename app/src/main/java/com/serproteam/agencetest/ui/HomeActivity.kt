@@ -60,13 +60,10 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         drawerLayout = binding.drawerLayout
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home, R.id.nav_miProducts, R.id.nav_setting,R.id.nav_profile
             ), drawerLayout
-//            ,R.id.nav_Session
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
@@ -92,12 +89,9 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.nav_Session -> {
-                    Log.v(logi, "Session")
-                    Toast.makeText(this, "se cerro la session", Toast.LENGTH_SHORT).show()
-                    Log.v(logi, "se cerro la session")
+                    Toast.makeText(this, resources.getString(R.string.closeSession), Toast.LENGTH_SHORT).show()
                     LoginManager.getInstance().logOut()
                     FirebaseAuth.getInstance().signOut()
-
                     userViewModel.delUser(applicationContext)
                     startActivity(Intent(this, MainActivity::class.java))
                     return@OnNavigationItemSelectedListener true
@@ -123,8 +117,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.nav_Session) {
-            Toast.makeText(this, "se cerro la session", Toast.LENGTH_SHORT).show()
-            Log.v(logi, "se cerro la session")
+            Toast.makeText(this, resources.getString(R.string.closeSession), Toast.LENGTH_SHORT).show()
             LoginManager.getInstance().logOut()
             FirebaseAuth.getInstance().signOut()
         }
