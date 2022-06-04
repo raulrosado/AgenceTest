@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -19,6 +20,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.serproteam.agencetest.R
 import com.serproteam.agencetest.adapter.ProductsAdapter
 import com.serproteam.agencetest.adapter.ProductsAdapter.OnProductlickListener
@@ -115,57 +117,33 @@ class ListFragment : Fragment(), OnProductlickListener {
         /***
          *  Adding OnScroll listener for parent RecyclerView
          */
-        binding.recyclerProducts.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-//            Log.v(logi, "oldScrooll: ${oldScrollY}  scrool:${scrollY}")
-            if (oldScrollY < -60) {
-                val layoutManager = binding.recyclerProducts.layoutManager as LinearLayoutManager
-                val visibleItemCount = layoutManager.childCount
-                val totalItemCount = layoutManager.itemCount
-                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
-                var falta = arrayProducts.size - totalItemCount
-                Log.v(
-                    logi,
-                    "totalItemCount: $visibles" + " arrayProducts.size: " + arrayProducts.size + "falta:" + falta
-                )
-                Log.v(logi, "firstVisibleItemPosition: $firstVisibleItemPosition")
-
-                lastVisible = visibles
-                lastVisible = visibles +3
-                Log.v(logi, "falta: " + lastVisible)
-                Log.v(logi, "falta: +3" )
-                if (lastVisible > arrayProducts.size) {
-                    lastVisible = arrayProducts.size
-                }
-
-                if (visibles < arrayProducts.size) {
-                    Log.v(
-                        logi,
-                        " ES MENOR"
-                    )
-//                    Log.v(
-//                        logi,
-//                        "${visibles} < ${lastVisible}"
-//                    )
-//                    if (lastVisible > arrayProducts.size) {
-//                        lastVisible = arrayProducts.size
-//                        Log.v(logi, "es mayor")
-//                    }
-//                    if (visibles > arrayProducts.size) {
-//                        visibles = arrayProducts.size
-//                        Log.v(logi, "es mayor")
-//                    }
+        binding.recyclerProducts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (!recyclerView.canScrollVertically(1)) {
+                    Toast.makeText(context, "Last", Toast.LENGTH_LONG).show();
+                    lastVisible = visibles + 3
+                    Log.v(logi, "falta: " + lastVisible)
+                    Log.v(logi, "falta: +3")
+                    if (lastVisible > arrayProducts.size) {
+                        lastVisible = arrayProducts.size
+                    }
                     if (visibles < arrayProducts.size) {
-                        productAdapter.addItem(arrayProducts.subList(visibles, lastVisible))
-                    }
-                    visibles = lastVisible
-                    if (visibles > arrayProducts.size - 1) {
-                        visibles = arrayProducts.size
-                        Log.v(logi, "es mayor")
+                        Log.v(
+                            logi,
+                            " ES MENOR"
+                        )
+                        if (visibles < arrayProducts.size) {
+                            productAdapter.addItem(arrayProducts.subList(visibles, lastVisible))
+                        }
+                        visibles = lastVisible
+                        if (visibles > arrayProducts.size - 1) {
+                            visibles = arrayProducts.size
+                            Log.v(logi, "es mayor")
+                        }
                     }
                 }
-
             }
-        }
+        })
 
         cartViewModel.getCart(requireContext())
         cartViewModel.Cart.observe(viewLifecycleOwner, Observer {
