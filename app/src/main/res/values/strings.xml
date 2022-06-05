@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">AgenceTest</string>
 
-
+    <string name="facebook_app_id">1454906531617985</string>
+    <string name="fb_login_protocol_scheme">fb1454906531617985</string>
+    <string name="facebook_client_token">f58cb6d638dc767dedb030c370f2fa56</string>
 
     <string name="username">Usuario</string>
     <string name="password">Contraseña</string>
